@@ -12,7 +12,19 @@ const auth = require('./auth')(app);
 const Movies = Models.Movie;
 const Users = Models.User;
 
-mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
+// mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
+// const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/myFlix?retryWrites=true";
+const uri = "mongodb://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-shard-00-00-mgsqm.mongodb.net:27017,myflixdb-shard-00-01-mgsqm.mongodb.net:27017,myflixdb-shard-00-02-mgsqm.mongodb.net:27017/myFlix?ssl=true&replicaSet=myFlixDB-shard-0&authSource=admin&retryWrites=true"
+const options = {
+  // reconnectTries: Number.MAX_VALUE,
+  // poolSize: 10,
+	// reconnectInterval: 500,
+  // autoReconnect: true,
+  useNewUrlParser: true,
+	// dbName: 'myFlix'
+};
+//
+mongoose.connect(uri, options);
 
 /*app.get('/movies', (req, res) => {
 	res.send('Welcome');
@@ -161,6 +173,6 @@ app.get("/movies", passport.authenticate('jwt', { session: false }), function(re
 
 });
 
-app.listen(8080, () =>
+app.listen(process.env.PORT || 8080, () =>
   console.log(`Your app is listening on port 8080`)
 );
