@@ -12,7 +12,10 @@ const auth = require('./auth')(app);
 const Movies = Models.Movie;
 const Users = Models.User;
 
-mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
+//mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
+const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/test?retryWrites=true";
+mongoose.connect(uri, { useNewUrlParser: true });
+
 
 /*app.get('/movies', (req, res) => {
 	res.send('Welcome');
@@ -161,6 +164,6 @@ app.get("/movies", passport.authenticate('jwt', { session: false }), function(re
 
 });
 
-app.listen(8080, () =>
+app.listen(process.env.PORT || 3000, () =>
   console.log(`Your app is listening on port 8080`)
 );
