@@ -1,0 +1,4 @@
+{"_id":{"$oid":"5c689bae68650405391200d2"},"Username":"mlitsa","Password":"111111","Email":"mlitsa83@gmail.com","Birthday":{"$date":"2000-09-08T00:00:00.000Z"}}
+{"_id":{"$oid":"5c699c60a87e7b965d500a18"},"FavoriteMovies":[],"Username":"msonia","Password":"123456","Email":"sonia@gmail.com","Birthday":{"$date":"1986-05-02T00:00:00.000Z"},"__v":0}
+{"_id":{"$oid":"5c699dd052ea9b969ea17f3b"},"FavoriteMovies":[],"Username":"gougos","Password":"123456","Email":"gougos@gmail.com","Birthday":{"$date":"1985-08-07T00:00:00.000Z"},"__v":0}
+{"_id":{"$oid":"5c69a045f1c43e96e57e3f97"},"FavoriteMovies":[],"Username":"gougakos","Password":"123456","Email":"gougos@gmail.com","Birthday":{"$date":"1985-08-07T00:00:00.000Z"},"__v":0}
