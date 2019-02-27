@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Models = require('./models.js');
 const passport = require('passport');
 require('./passport');
+const MongoClient = require('mongodb').MongoClient;
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,8 +13,13 @@ const auth = require('./auth')(app);
 const Movies = Models.Movie;
 const Users = Models.User;
 
-//mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
+// mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
 const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/test?retryWrites=true";
+// const client = new MongoClient(uri, { useNewUrlParser: true });
+// client.connect(err => {
+//   client.close();
+// });
+//
 mongoose.connect(uri, { useNewUrlParser: true });
 
 
@@ -164,6 +170,6 @@ app.get("/movies", passport.authenticate('jwt', { session: false }), function(re
 
 });
 
-app.listen(process.env.PORT || 3000, () =>
+app.listen(process.env.PORT || 8080, () =>
   console.log(`Your app is listening on port 8080`)
 );
