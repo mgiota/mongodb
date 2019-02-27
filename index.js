@@ -15,11 +15,11 @@ const Users = Models.User;
 
 // mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
 const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/test?retryWrites=true";
-// const client = new MongoClient(uri, { useNewUrlParser: true });
-// client.connect(err => {
-//   client.close();
-// });
-//
+const client = new MongoClient(uri, { useNewUrlParser: true });
+client.connect(err => {
+  client.close();
+});
+
 mongoose.connect(uri, { useNewUrlParser: true });
 
 
