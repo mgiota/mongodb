@@ -20,10 +20,10 @@ let collection;
 // const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/myFlix?retryWrites=true";
 const uri = "mongodb://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-shard-00-00-mgsqm.mongodb.net:27017,myflixdb-shard-00-01-mgsqm.mongodb.net:27017,myflixdb-shard-00-02-mgsqm.mongodb.net:27017/myFlix?ssl=true&replicaSet=myFlixDB-shard-0&authSource=admin&retryWrites=true"
 const options = {
-  // reconnectTries: Number.MAX_VALUE,
-  // poolSize: 10,
-	// reconnectInterval: 500,
-  // autoReconnect: true,
+  reconnectTries: Number.MAX_VALUE,
+  poolSize: 10,
+	reconnectInterval: 500,
+  autoReconnect: true,
   useNewUrlParser: true,
 	// dbName: 'myFlix'
 };
