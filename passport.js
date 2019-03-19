@@ -14,7 +14,9 @@ passport.use(new LocalStrategy({
     }, function(username, password, callback) {
 		console.log(username, '!!username');
 		console.log(password, '!!password');
-		Users.findOne({Username: username, Password: password }, function(err, user) {
+    var hashedPassword = Users.hashPassword(password);
+
+		Users.findOne({Username: username }, function(err, user) {
 			if (err) {
 				console.log(err);
 				return callback(err);
@@ -23,6 +25,12 @@ passport.use(new LocalStrategy({
 			if (!user) {
 				return callback(null, false, { message: 'Incorrect username' });
 			}
+
+      if (!user.validatePassword(password)) {
+				console.log("incorrect password");
+				return callback(null, false, { message: 'Incorrect password.' });
+			}
+
 			return callback(null, user);
 
 		})
