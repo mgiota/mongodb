@@ -54,9 +54,14 @@ mongoose.connect(uri, options);
 app.get("/users", (req, res) => {
 	console.log('users')
 	Users.find({}, (err, users) => {
-		console.log(users)
+		// console.log(err, '!!error')
+		// console.log(users)
 		res.status(201).send(users);
 	});
+	// Users.find().then(function(users) {
+	// 	console.log(users, '!!users');
+	// 	res.status(201).send(users);
+	// }).catch(e => console.log(e));
 });
 
 /*app.post('/users', (req, res) => {
