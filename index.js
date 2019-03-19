@@ -5,9 +5,30 @@ const Models = require('./models.js');
 const passport = require('passport');
 require('./passport');
 const MongoClient = require('mongodb').MongoClient;
+const cors = require('cors');
+
 
 const app = express();
 app.use(bodyParser.json());
+var allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+
+app.use(cors({
+ origin: function(origin, callback){
+	 	console.log(origin)
+	 	// allow requests with no origin
+    // (like mobile apps or curl requests)
+		if(!origin) return callback(null, true);
+
+   if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
+     var message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+     return callback(new Error(message ), false);
+   }
+   return callback(null, true);
+ }
+ // origin: 'http://localhost:8080'
+}));
+
+
 const auth = require('./auth')(app);
 
 const Movies = Models.Movie;
@@ -16,19 +37,19 @@ const Users = Models.User;
 let database;
 let collection;
 
-// mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
+mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
 // const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/myFlix?retryWrites=true";
-const uri = "mongodb://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-shard-00-00-mgsqm.mongodb.net:27017,myflixdb-shard-00-01-mgsqm.mongodb.net:27017,myflixdb-shard-00-02-mgsqm.mongodb.net:27017/myFlix?ssl=true&replicaSet=myFlixDB-shard-0&authSource=admin&retryWrites=true"
-const options = {
-  reconnectTries: Number.MAX_VALUE,
-  poolSize: 10,
-	reconnectInterval: 500,
-  autoReconnect: true,
-  useNewUrlParser: true,
-	// dbName: 'myFlix'
-};
+// const uri = "mongodb://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-shard-00-00-mgsqm.mongodb.net:27017,myflixdb-shard-00-01-mgsqm.mongodb.net:27017,myflixdb-shard-00-02-mgsqm.mongodb.net:27017/myFlix?ssl=true&replicaSet=myFlixDB-shard-0&authSource=admin&retryWrites=true"
+// const options = {
+//   reconnectTries: Number.MAX_VALUE,
+//   poolSize: 10,
+// 	reconnectInterval: 500,
+//   autoReconnect: true,
+//   useNewUrlParser: true,
+// 	// dbName: 'myFlix'
+// };
 //
-mongoose.connect(uri, options);
+// mongoose.connect(uri, options);
 
 
 /*app.get('/movies', (req, res) => {
@@ -92,7 +113,9 @@ app.get("/users", (req, res) => {
 
 app.post('/users', (req, res) => {
 	//res.send("Successful request for creating a new user")
-	console.log(req.body.Username);
+  var hashedPassword = Users.hashPassword(req.body.Password);
+
+	console.log(req.body.Username, req.body.Password);
 	Users.findOne({ Username: req.body.Username })
 		.then(user => {
 			if (user) {
@@ -100,13 +123,13 @@ app.post('/users', (req, res) => {
 			} else {
 				Users.create({
 					Username: req.body.Username,
-					Password: req.body.Password,
+					Password: hashedPassword,
 					Email: req.body.Email,
 					Birthday: req.body.Birthday
 				}, (err, user) => {
 					if (err) {
-						console.error(error);
-						res.status(500).send("Error: " + error);
+						console.error(err);
+						res.status(500).send("Error: " + err);
 					} else {
 						//res.status(201).json(user)
 						res.json(user);
