@@ -5,22 +5,25 @@ const Models = require('./models.js');
 const passport = require('passport');
 require('./passport');
 const MongoClient = require('mongodb').MongoClient;
+const validator = require('express-validator');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(validator());
 const auth = require('./auth')(app);
 
 const Movies = Models.Movie;
 const Users = Models.User;
 
-// mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
-const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/test?retryWrites=true";
-const client = new MongoClient(uri, { useNewUrlParser: true });
-client.connect(err => {
-  client.close();
-});
+mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
+//const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/test?retryWrites=true";
+// const uri = "mongodb://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-shard-00-00-mgsqm.mongodb.net:27017,myflixdb-shard-00-01-mgsqm.mongodb.net:27017,myflixdb-shard-00-02-mgsqm.mongodb.net:27017/test?ssl=true&replicaSet=myFlixDB-shard-0&authSource=admin&retryWrites=true"
+// const client = new MongoClient(uri, { useNewUrlParser: true });
+// client.connect(err => {
+//   client.close();
+// });
 
-mongoose.connect(uri, { useNewUrlParser: true });
+// mongoose.connect(uri, { useNewUrlParser: true });
 
 
 /*app.get('/movies', (req, res) => {
@@ -46,6 +49,7 @@ mongoose.connect(uri, { useNewUrlParser: true });
 app.get("/users", (req, res) => {
 	console.log('users')
 	Users.find({}, (err, users) => {
+		console.log(users, 'aaa')
 		res.status(201).send(users);
 	});
 });
@@ -79,6 +83,18 @@ app.get("/users", (req, res) => {
 app.post('/users', (req, res) => {
 	//res.send("Successful request for creating a new user")
 	console.log(req.body.Username);
+	req.checkBody('Username', 'Username is required').notEmpty();
+	req.checkBody('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric()
+	req.checkBody('Password', 'Password is required').notEmpty();
+	req.checkBody('Email', 'Email is required').notEmpty();
+	req.checkBody('Email', 'Email does not appear to be valid').isEmail();
+	// check the validation object for errors
+	var errors = req.validationErrors();
+
+	if (errors) {
+		return res.status(422).json({ errors: errors });
+	}
+
 	Users.findOne({ Username: req.body.Username })
 		.then(user => {
 			if (user) {
