@@ -8,7 +8,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.json());
-var allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+var allowedOrigins = ['http://localhost:8080', 'http://testsite.com', 'http://localhost:1234'];
 
 app.use(cors({
  origin: function(origin, callback) {
@@ -122,13 +122,15 @@ app.put('/users/:Username', function(req, res) {
   );
 });
 
-app.get("/movies", passport.authenticate('jwt', { session: false }), function(req, res) {
+// app.get("/movies", passport.authenticate('jwt', { session: false }), function(req, res) {
+app.get("/movies", function(req, res) {
   Movies.find()
   .then(function(movies) {
-      res.status(201).json(movies);
+    res.status(201).json(movies);
+
   }).catch(function(error) {
-      console.error(error);
-      res.status(500).send("Error: " + error);
+    console.error(error);
+    res.status(500).send("Error: " + error);
   });
 });
 
