@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "build": "parcel client/src/index.html",
+    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

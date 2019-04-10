@@ -20,14 +20,14 @@ export class MainView extends React.Component {
   }
 
   getMovies(token) {
-    //axios.get('http://localhost:8080/movies')
+    //axios.get('http://localhost:8080/movies', {
     axios.get('https://my-flixdb-api2.herokuapp.com/movies', {
       headers: { Authorization: `Bearer ${token}`}
     })
     .then(response => {
       // Assign the result to the state
       this.setState({
-        movies: response.data,
+        movies: response.data
       });
     })
     .catch(function (error) {
@@ -42,7 +42,7 @@ export class MainView extends React.Component {
         user: localStorage.getItem('user')
       });
       this.getMovies(accessToken);
-   }
+    }
   }
 
   onMovieClick(movie) {

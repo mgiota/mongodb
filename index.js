@@ -3,32 +3,17 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const Models = require('./models.js');
 const passport = require('passport');
+const path = require('path');
 require('./passport');
 const cors = require('cors');
 
 const app = express();
-app.use(bodyParser.json());
-var allowedOrigins = ['http://localhost:8080', 'http://testsite.com', 'http://localhost:1234'];
-
-app.use(cors({
- origin: function(origin, callback) {
-    // allow requests with no origin
-    // (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
-      var message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
-      return callback(new Error(message ), false);
-    }
-    return callback(null, true);
-  }
-  // origin: 'http://localhost:8080'
-}));
-
 const validator = require('express-validator');
+app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(validator());
-
+app.use(cors());
 const auth = require('./auth')(app);
 
 const Movies = Models.Movie;
@@ -36,14 +21,14 @@ const Users = Models.User;
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 
+app.get("/users/:Username", (req, res) => {
+  res.json(Users.find(user => user.Username === req.params.Username));
+});
+
 app.get("/users", (req, res) => {
-    Users.find({}, (err, users) => {
-      res.status(201).send(users);
-    });
-    // Users.find().then(function(users) {
-    // 	console.log(users, '!!users');
-    // 	res.status(201).send(users);
-    // }).catch(e => console.log(e));
+  Users.find({}, (err, users) => {
+    res.status(201).send(users);
+  });
 });
 
 app.post('/users', (req, res) => {
@@ -122,8 +107,7 @@ app.put('/users/:Username', function(req, res) {
   );
 });
 
-// app.get("/movies", passport.authenticate('jwt', { session: false }), function(req, res) {
-app.get("/movies", function(req, res) {
+app.get("/movies", passport.authenticate('jwt', { session: false }), function(req, res) {
   Movies.find()
   .then(function(movies) {
     res.status(201).json(movies);
@@ -132,6 +116,14 @@ app.get("/movies", function(req, res) {
     console.error(error);
     res.status(500).send("Error: " + error);
   });
+});
+
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+});
+
+app.get('*', function(req, res) {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
 app.listen(process.env.PORT || 8080, () =>
