@@ -19,19 +19,30 @@ export class MainView extends React.Component {
     };
   }
 
-  componentDidMount() {
-    //axios.get('http://localhost:8080/movies')
-    axios.get('https://my-flixdb-api2.herokuapp.com/movies')
-      .then(response => {
-        // console.log(response)
-        // Assign the result to the state
-        this.setState({
-          movies: response.data
-        });
-      })
-      .catch(function (error) {
-        console.log(error);
+  getMovies(token) {
+    //axios.get('http://localhost:8080/movies', {
+    axios.get('https://my-flixdb-api2.herokuapp.com/movies', {
+      headers: { Authorization: `Bearer ${token}`}
+    })
+    .then(response => {
+      // Assign the result to the state
+      this.setState({
+        movies: response.data
       });
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
+  componentDidMount() {
+    let accessToken = localStorage.getItem('token');
+    if (accessToken !== null) {
+      this.setState({
+        user: localStorage.getItem('user')
+      });
+      this.getMovies(accessToken);
+    }
   }
 
   onMovieClick(movie) {
@@ -40,10 +51,13 @@ export class MainView extends React.Component {
     });
   }
 
-  onLoggedIn(user) {
+  onLoggedIn(authData) {
     this.setState({
-      user
+      user: authData.user.Username
     });
+    localStorage.setItem('token', authData.token);
+    localStorage.setItem('user', authData.user.Username);
+    this.getMovies(authData.token);
   }
 
   // This overrides the render() method of the superclass

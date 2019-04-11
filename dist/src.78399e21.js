@@ -29940,19 +29940,35 @@ function (_React$Component) {
   }
 
   _createClass(MainView, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
+    key: "getMovies",
+    value: function getMovies(authData) {
       var _this2 = this;
 
-      _axios.default.get('http://localhost:8080/movies').then(function (response) {
-        console.log(response); // Assign the result to the state
-
+      _axios.default.get('http://localhost:8080/movies', {
+        headers: {
+          Authorization: "Bearer ".concat(authData.token)
+        }
+      }).then(function (response) {
+        // Assign the result to the state
         _this2.setState({
           movies: response.data
         });
       }).catch(function (error) {
         console.log(error);
       });
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var accessToken = localStorage.getItem('token');
+
+      if (accessToken !== null) {
+        var _authData = {
+          token: accessToken,
+          user: localStorage.getItem('user')
+        };
+        this.getMovies(_authData);
+      }
     }
   }, {
     key: "onMovieClick",
@@ -29967,6 +29983,8 @@ function (_React$Component) {
       this.setState({
         user: user
       });
+      localStorage.setItem('token', authData.token);
+      localStorage.setItem('user', authData.user.Username);
     } // This overrides the render() method of the superclass
     // No need to call super() though, as it does nothing by default
 
@@ -30167,7 +30185,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49920" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60700" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
