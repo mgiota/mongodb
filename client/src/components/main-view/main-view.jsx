@@ -19,18 +19,31 @@ export class MainView extends React.Component {
     };
   }
 
-  componentDidMount() {
-    axios.get('http://localhost:8080/movies')
-      .then(response => {
-        console.log(response)
-        // Assign the result to the state
-        this.setState({
-          movies: response.data
-        });
-      })
-      .catch(function (error) {
-        console.log(error);
+  getMovies(authData) {
+    axios.get('http://localhost:8080/movies', {
+      headers: { Authorization: `Bearer ${authData.token}`}
+    })
+    .then(response => {
+      // Assign the result to the state
+      this.setState({
+        movies: response.data,
       });
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  }
+
+
+  componentDidMount() {
+    let accessToken = localStorage.getItem('token');
+   if (accessToken !== null) {
+     const authData = {
+       token: accessToken,
+       user: localStorage.getItem('user')
+     };
+     this.getMovies(authData);
+   }
   }
 
   onMovieClick(movie) {
@@ -43,6 +56,8 @@ export class MainView extends React.Component {
     this.setState({
       user
     });
+    localStorage.setItem('token', authData.token);
+    localStorage.setItem('user', authData.user.Username);
   }
 
   // This overrides the render() method of the superclass
