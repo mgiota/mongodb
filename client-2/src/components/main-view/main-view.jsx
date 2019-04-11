@@ -19,15 +19,14 @@ export class MainView extends React.Component {
     };
   }
 
-  getMovies(authData) {
-    axios.get('http://localhost:8080/movies', {
-      headers: { Authorization: `Bearer ${authData.token}`}
+  getMovies(token) {
+    axios.get('https://my-flixdb-api2.herokuapp.com/movies', {
+      headers: { Authorization: `Bearer ${token}`}
     })
     .then(response => {
       // Assign the result to the state
       this.setState({
-        movies: response.data,
-        user: authData.user
+        movies: response.data
       });
     })
     .catch(function (error) {
@@ -38,11 +37,10 @@ export class MainView extends React.Component {
   componentDidMount() {
     let accessToken = localStorage.getItem('token');
     if (accessToken !== null) {
-     const authData = {
-       token: accessToken,
-       user: localStorage.getItem('user')
-     };
-     this.getMovies(authData);
+      this.setState({
+        user: localStorage.getItem('user')
+      });
+      this.getMovies(accessToken);
     }
   }
 
@@ -58,7 +56,7 @@ export class MainView extends React.Component {
     });
     localStorage.setItem('token', authData.token);
     localStorage.setItem('user', authData.user.Username);
-    this.getMovies(authData);
+    this.getMovies(authData.token);
   }
 
   // This overrides the render() method of the superclass

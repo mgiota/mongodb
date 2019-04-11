@@ -10,23 +10,23 @@ const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.json());
-var allowedOrigins = ['http://localhost:8080', 'http://testsite.com', 'http://localhost:1234'];
-
-app.use(cors({
- origin: function(origin, callback){
-	 	console.log(origin)
-	 	// allow requests with no origin
-    // (like mobile apps or curl requests)
-		if(!origin) return callback(null, true);
-
-   if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
-     var message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
-     return callback(new Error(message ), false);
-   }
-   return callback(null, true);
- }
- // origin: 'http://localhost:8080'
-}));
+app.use(cors());
+// var allowedOrigins = ['http://localhost:8080', 'http://testsite.com', 'http://localhost:1234'];
+//
+// app.use(cors({
+//  origin: function(origin, callback){
+// 	 	console.log(origin)
+// 	 	// allow requests with no origin
+//     // (like mobile apps or curl requests)
+// 		if(!origin) return callback(null, true);
+//
+//    if(allowedOrigins.indexOf(origin) === -1){ // If a specific origin isn’t found on the list of allowed origins
+//      var message = 'The CORS policy for this application doesn’t allow access from origin ' + origin;
+//      return callback(new Error(message ), false);
+//    }
+//    return callback(null, true);
+//  }
+// }));
 
 
 const auth = require('./auth')(app);
@@ -37,19 +37,11 @@ const Users = Models.User;
 let database;
 let collection;
 
-mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
-// const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/myFlix?retryWrites=true";
+// mongoose.connect('mongodb://localhost:27017/myFlix', { useNewUrlParser: true });
+const uri = "mongodb+srv://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-mgsqm.mongodb.net/myFlix?retryWrites=true";
 // const uri = "mongodb://myFlixDBadmin:WkayMtRiaN0T6ND9@myflixdb-shard-00-00-mgsqm.mongodb.net:27017,myflixdb-shard-00-01-mgsqm.mongodb.net:27017,myflixdb-shard-00-02-mgsqm.mongodb.net:27017/myFlix?ssl=true&replicaSet=myFlixDB-shard-0&authSource=admin&retryWrites=true"
-// const options = {
-//   reconnectTries: Number.MAX_VALUE,
-//   poolSize: 10,
-// 	reconnectInterval: 500,
-//   autoReconnect: true,
-//   useNewUrlParser: true,
-// 	// dbName: 'myFlix'
-// };
-//
-// mongoose.connect(uri, options);
+
+mongoose.connect(uri);
 
 
 /*app.get('/movies', (req, res) => {
@@ -196,7 +188,7 @@ app.put('/users/:Username', function(req, res) {
 
 // app.get("/movies", passport.authenticate('jwt', { session: false }), function(req, res) {
 
-app.get("/movies", function(req, res) {
+app.get("/movies", passport.authenticate('jwt', { session: false }), function(req, res) {
 	Movies.find()
 		.then(function(movies) {
 			res.status(201).json(movies);
