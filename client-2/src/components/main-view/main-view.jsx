@@ -14,7 +14,7 @@ export class MainView extends React.Component {
     // Initialize the state to an empty object so we can destructure it later
     this.state = {
       movies: null,
-      selectedMovie: null,
+      selectedMovieId: null,
       user: null
     };
   }
@@ -35,6 +35,9 @@ export class MainView extends React.Component {
   }
 
   componentDidMount() {
+    window.addEventListener('hashchange', this.handleNewHash, false);
+    this.handleNewHash();
+
     let accessToken = localStorage.getItem('token');
     if (accessToken !== null) {
       this.setState({
@@ -44,9 +47,19 @@ export class MainView extends React.Component {
     }
   }
 
-  onMovieClick(movie) {
+  handleNewHash = () => {
+    console.log('!!handleNew hash')
+    const movieId = window.location.hash.replace(/^#\/?|\/$/g, '').split('/');
+
     this.setState({
-      selectedMovie: movie
+      selectedMovieId: movieId[0]
+    });
+  }
+
+  onMovieClick(movie) {
+    window.location.hash = '#' + movie._id;
+    this.setState({
+      selectedMovieId: movie._id
     });
   }
 
@@ -62,12 +75,14 @@ export class MainView extends React.Component {
   // This overrides the render() method of the superclass
   // No need to call super() though, as it does nothing by default
   render() {
-    const { movies, selectedMovie, user } = this.state;
+    const { movies, selectedMovieId, user } = this.state;
 
     if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
 
     // Before the movies have been loaded
     if (!movies) return <div className="main-view"/>;
+    const selectedMovie = selectedMovieId ? movies.find(m => m._id === selectedMovieId) : null;
+
 
     return (
      <div className="main-view">
