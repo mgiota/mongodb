@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 
-export function RegisterView(props) {
+export function RegistrationView(props) {
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ email, setEmail ] = useState('');
@@ -13,7 +13,7 @@ export function RegisterView(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
     /* Send a request to the server for authentication */
-    axios.post('http://localhost:8080/users', {
+    axios.post('https://my-flixdb-api2.herokuapp.com/users', {
       Username: username,
       Password: password,
       Email: email
@@ -21,6 +21,7 @@ export function RegisterView(props) {
     .then(response => {
       const data = response.data;
       console.log(data);
+      window.open('/');
     })
     .catch(e => {
       console.log('problem registering new user');
