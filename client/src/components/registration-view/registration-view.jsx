@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 
-export function RegisterView(props) {
+export function RegistrationView(props) {
   const [ username, setUsername ] = useState('');
   const [ password, setPassword ] = useState('');
   const [ email, setEmail ] = useState('');
@@ -22,6 +22,7 @@ export function RegisterView(props) {
     .then(response => {
       const data = response.data;
       console.log(data);
+      window.open('/');
     })
     .catch(e => {
       console.log('problem registering new user');
