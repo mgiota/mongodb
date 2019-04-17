@@ -7,6 +7,7 @@ import { LoginView } from '../login-view/login-view';
 import { MovieCard } from '../movie-card/movie-card';
 import { MovieView } from '../movie-view/movie-view';
 import { RegistrationView } from '../registration-view/registration-view';
+import { DirectorView } from '../director-view/director-view';
 
 export class MainView extends React.Component {
   constructor() {
@@ -17,12 +18,13 @@ export class MainView extends React.Component {
     // Initialize the state to an empty object so we can destructure it later
     this.state = {
       movies: [],
-      selectedMovieId: null,
       user: null
     };
   }
 
   getMovies(token) {
+    // axios.get('http://localhost:8080/movies', {
+
     axios.get('https://my-flixdb-api2.herokuapp.com/movies', {
       headers: { Authorization: `Bearer ${token}`}
     })
@@ -83,7 +85,6 @@ export class MainView extends React.Component {
     // if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
 
     // Before the movies have been loaded
-    // if (!movies) return <div className="main-view"/>;
     // const selectedMovie = selectedMovieId ? movies.find(m => m._id === selectedMovieId) : null;
 
 
@@ -92,11 +93,17 @@ export class MainView extends React.Component {
           <div className="main-view">
             <Route exact path="/" render={() => {
                 if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
+                if (!movies || !movies.length) return <div className="main-view"/>;
+
                 return movies.map(m => <MovieCard key={m._id} movie={m}/>)
               }
             }/>
-            <Route exact path="/login" render={() => <LoginView onLoggedIn={user => this.onLoggedIn(user)} />}/>
             <Route path="/movies/:movieId" render={({match}) => <MovieView movie={movies.find(m => m._id === match.params.movieId)}/>}/>
+            <Route path="/directors/:name" render={({ match }) => {
+              if (!movies || !movies.length) return <div className="main-view"/>;
+              return <DirectorView director={movies.find(m => m.Director.Name === match.params.name).Director}/>}
+            } />
+
             <Route path="/register" render={() => <RegistrationView />} />
           </div>
        </Router>
