@@ -1,9 +1,12 @@
 import React from 'react';
 import axios from 'axios';
 
+import { BrowserRouter as Router, Route} from "react-router-dom";
+
 import { LoginView } from '../login-view/login-view';
 import { MovieCard } from '../movie-card/movie-card';
 import { MovieView } from '../movie-view/movie-view';
+import { RegistrationView } from '../registration-view/registration-view';
 
 export class MainView extends React.Component {
   constructor() {
@@ -13,7 +16,7 @@ export class MainView extends React.Component {
 
     // Initialize the state to an empty object so we can destructure it later
     this.state = {
-      movies: null,
+      movies: [],
       selectedMovieId: null,
       user: null
     };
@@ -35,8 +38,8 @@ export class MainView extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener('hashchange', this.handleNewHash, false);
-    this.handleNewHash();
+    // window.addEventListener('hashchange', this.handleNewHash, false);
+    // this.handleNewHash();
 
     let accessToken = localStorage.getItem('token');
     if (accessToken !== null) {
@@ -47,21 +50,21 @@ export class MainView extends React.Component {
     }
   }
 
-  handleNewHash = () => {
-    console.log('!!handleNew hash')
-    const movieId = window.location.hash.replace(/^#\/?|\/$/g, '').split('/');
+  // handleNewHash = () => {
+  //   console.log('!!handleNew hash')
+  //   const movieId = window.location.hash.replace(/^#\/?|\/$/g, '').split('/');
+  //
+  //   this.setState({
+  //     selectedMovieId: movieId[0]
+  //   });
+  // }
 
-    this.setState({
-      selectedMovieId: movieId[0]
-    });
-  }
-
-  onMovieClick(movie) {
-    window.location.hash = '#' + movie._id;
-    this.setState({
-      selectedMovieId: movie._id
-    });
-  }
+  // onMovieClick(movie) {
+  //   window.location.hash = '#' + movie._id;
+  //   this.setState({
+  //     selectedMovieId: movie._id
+  //   });
+  // }
 
   onLoggedIn(authData) {
     this.setState({
@@ -75,25 +78,29 @@ export class MainView extends React.Component {
   // This overrides the render() method of the superclass
   // No need to call super() though, as it does nothing by default
   render() {
-    const { movies, selectedMovieId, user } = this.state;
+    const { movies, user } = this.state;
 
-    if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
+    // if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
 
     // Before the movies have been loaded
-    if (!movies) return <div className="main-view"/>;
-    const selectedMovie = selectedMovieId ? movies.find(m => m._id === selectedMovieId) : null;
+    // if (!movies) return <div className="main-view"/>;
+    // const selectedMovie = selectedMovieId ? movies.find(m => m._id === selectedMovieId) : null;
 
 
     return (
-     <div className="main-view">
-      { selectedMovie
-        ? <MovieView movie={selectedMovie}/>
-        : movies.map(movie => (
-        <MovieCard key={movie._id} movie={movie} onClick={movie => this.onMovieClick(movie)} />
-        ))
-      }
+      <Router>
+          <div className="main-view">
+            <Route exact path="/" render={() => {
+                if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
+                return movies.map(m => <MovieCard key={m._id} movie={m}/>)
+              }
+            }/>
+            <Route exact path="/login" render={() => <LoginView onLoggedIn={user => this.onLoggedIn(user)} />}/>
+            <Route path="/movies/:movieId" render={({match}) => <MovieView movie={movies.find(m => m._id === match.params.movieId)}/>}/>
+            <Route path="/register" render={() => <RegistrationView />} />
+          </div>
+       </Router>
+     );
 
-     </div>
-    );
   }
 }
