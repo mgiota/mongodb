@@ -1,15 +1,20 @@
 import React from 'react';
 import axios from 'axios';
 
+import { connect } from 'react-redux';
+
 import { BrowserRouter as Router, Route} from "react-router-dom";
 
+import { setMovies } from '../../actions/actions';
+
+import MoviesList from '../movies-list/movies-list';
 import { LoginView } from '../login-view/login-view';
 import { MovieCard } from '../movie-card/movie-card';
-import { MovieView } from '../movie-view/movie-view';
+import MovieView from '../movie-view/movie-view';
 import { RegistrationView } from '../registration-view/registration-view';
 import { DirectorView } from '../director-view/director-view';
 
-export class MainView extends React.Component {
+class MainView extends React.Component {
   constructor() {
     // Call the superclass constructor
     // so React can initialize it
@@ -30,9 +35,10 @@ export class MainView extends React.Component {
     })
     .then(response => {
       // Assign the result to the state
-      this.setState({
-        movies: response.data
-      });
+      // this.setState({
+      //   movies: response.data
+      // });
+      this.props.setMovies(response.data);
     })
     .catch(function (error) {
       console.log(error);
@@ -80,6 +86,7 @@ export class MainView extends React.Component {
   // This overrides the render() method of the superclass
   // No need to call super() though, as it does nothing by default
   render() {
+    console.log('render')
     const { movies, user } = this.state;
 
     // if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
@@ -93,12 +100,10 @@ export class MainView extends React.Component {
           <div className="main-view">
             <Route exact path="/" render={() => {
                 if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
-                if (!movies || !movies.length) return <div className="main-view"/>;
-
-                return movies.map(m => <MovieCard key={m._id} movie={m}/>)
+                return <MoviesList />
               }
             }/>
-            <Route path="/movies/:movieId" render={({match}) => <MovieView movie={movies.find(m => m._id === match.params.movieId)}/>}/>
+            <Route path="/movies/:movieId" render={({match}) => <MovieView movieId={match.params.movieId}/>}/>
             <Route path="/directors/:name" render={({ match }) => {
               if (!movies || !movies.length) return <div className="main-view"/>;
               return <DirectorView director={movies.find(m => m.Director.Name === match.params.name).Director}/>}
@@ -108,6 +113,7 @@ export class MainView extends React.Component {
           </div>
        </Router>
      );
-
   }
 }
+
+export default connect(null, { setMovies } )(MainView);
