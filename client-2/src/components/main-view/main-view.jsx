@@ -12,7 +12,7 @@ import { LoginView } from '../login-view/login-view';
 import { MovieCard } from '../movie-card/movie-card';
 import MovieView from '../movie-view/movie-view';
 import { RegistrationView } from '../registration-view/registration-view';
-import { DirectorView } from '../director-view/director-view';
+import DirectorView from '../director-view/director-view';
 
 class MainView extends React.Component {
   constructor() {
@@ -87,7 +87,7 @@ class MainView extends React.Component {
   // No need to call super() though, as it does nothing by default
   render() {
     console.log('render')
-    const { movies, user } = this.state;
+    const { user } = this.state;
 
     // if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
 
@@ -105,8 +105,7 @@ class MainView extends React.Component {
             }/>
             <Route path="/movies/:movieId" render={({match}) => <MovieView movieId={match.params.movieId}/>}/>
             <Route path="/directors/:name" render={({ match }) => {
-              if (!movies || !movies.length) return <div className="main-view"/>;
-              return <DirectorView director={movies.find(m => m.Director.Name === match.params.name).Director}/>}
+              return <DirectorView directorName={match.params.name} /> }
             } />
 
             <Route path="/register" render={() => <RegistrationView />} />
