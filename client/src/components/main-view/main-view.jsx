@@ -13,6 +13,7 @@ import { MovieCard } from '../movie-card/movie-card';
 import MovieView from '../movie-view/movie-view';
 import { RegistrationView } from '../registration-view/registration-view';
 import DirectorView from '../director-view/director-view';
+import { ProfileUpdate } from '../profile-view/profile-update';
 
 class MainView extends React.Component {
   constructor() {
@@ -23,7 +24,10 @@ class MainView extends React.Component {
     // Initialize the state to an empty object so we can destructure it later
     this.state = {
       movies: [],
-      user: null
+      user: null,
+      email: '',
+      birthday: '',
+      token: ''
     };
   }
 
@@ -44,6 +48,25 @@ class MainView extends React.Component {
     });
   }
 
+  getUser(user, token) {
+    axios
+      //.get("http://localhost:8080/users/" + user, {
+      .get('https://my-flixdb-api2.herokuapp.com/' + user, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(response => {
+        // Assign the result to the state
+        this.setState({
+          email: response.data.Email,
+          birthday: response.data.Birthday,
+          token: token
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    }
+
   componentDidMount() {
     // window.addEventListener('hashchange', this.handleNewHash, false);
     // this.handleNewHash();
@@ -54,6 +77,7 @@ class MainView extends React.Component {
         user: localStorage.getItem('user')
       });
       this.getMovies(accessToken);
+      this.getUser(localStorage.getItem("user"), accessToken);
     }
   }
 
@@ -85,8 +109,7 @@ class MainView extends React.Component {
   // This overrides the render() method of the superclass
   // No need to call super() though, as it does nothing by default
   render() {
-    console.log('render')
-    const { user } = this.state;
+    const { user, token } = this.state;
 
     // if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
 
@@ -108,6 +131,11 @@ class MainView extends React.Component {
             } />
 
             <Route path="/register" render={() => <RegistrationView />} />
+            <Route
+              exact
+              path="/profile/update"
+              render={() => <ProfileUpdate user={user} token={token} />}
+            />
           </div>
        </Router>
      );

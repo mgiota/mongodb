@@ -21,9 +21,20 @@ const Users = Models.User;
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 
-app.get("/users/:Username", (req, res) => {
-  res.json(Users.find(user => user.Username === req.params.Username));
-});
+app.get("/users/:Username",
+  function (req, res) {
+    Users.findOne({
+        Username: req.params.Username
+      })
+      .then(function (user) {
+        res.json(user);
+      })
+      .catch(function (err) {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+      });
+  }
+);
 
 app.get("/users", (req, res) => {
   Users.find({}, (err, users) => {
@@ -86,7 +97,18 @@ app.delete('/users/:Username', function(req, res) {
   });
 });
 
-app.put('/users/:Username', function(req, res) {
+app.put('/users/:Username', passport.authenticate('jwt', { session: false }), function(req, res) {
+  req.checkBody('Username', 'Username is required').notEmpty();
+  req.checkBody('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric()
+  req.checkBody('Password', 'Password is required').notEmpty();
+  req.checkBody('Email', 'Email is required').notEmpty();
+  req.checkBody('Email', 'Email does not appear to be valid').isEmail();
+  // check the validation object for errors
+  var errors = req.validationErrors();
+
+  if (errors) {
+    return res.status(422).json({ errors: errors });
+  }
   Users.update(
     { Username: req.params.Username},
     { $set: {
@@ -98,10 +120,10 @@ app.put('/users/:Username', function(req, res) {
     { new: true },
     function(err, updatedUser) {
       if (err) {
-          console.error(err);
-          res.status(500).send("Error: " + err);
+        console.error(err);
+        res.status(500).send("Error: " + err);
       } else {
-          res.json(updatedUser);
+        res.json(updatedUser);
       }
     }
   );
