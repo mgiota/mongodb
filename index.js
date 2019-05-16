@@ -64,6 +64,21 @@ mongoose.connect(uri);
 	});
 });*/
 
+app.get("/users/:Username",
+  function (req, res) {
+    Users.findOne({
+        Username: req.params.Username
+      })
+      .then(function (user) {
+        res.json(user);
+      })
+      .catch(function (err) {
+        console.error(err);
+        res.status(500).send("Error: " + err);
+      });
+  }
+);
+
 app.get("/users", (req, res) => {
 	console.log('users')
 	Users.find({}, (err, users) => {
@@ -163,12 +178,15 @@ app.delete('/users/:Username', function(req, res) {
    });
 });
 
-app.put('/users/:Username', function(req, res) {
+app.put('/users/:Username', passport.authenticate('jwt', { session: false }), function(req, res) {
+	console.log('!!put request')
+	var hashedPassword = Users.hashPassword(req.body.Password);
+	console.log(hashedPassword, '!!hashedPassword')
 	Users.update(
 		{ Username: req.params.Username},
 		{ $set: {
 			Username: req.body.Username,
-			Password: req.body.Password,
+			Password: hashedPassword,
 			Email: req.body.Email,
 			Birthday: req.body.Birthday
 		}},
