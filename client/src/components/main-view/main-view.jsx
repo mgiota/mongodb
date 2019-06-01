@@ -13,7 +13,10 @@ import { MovieCard } from '../movie-card/movie-card';
 import MovieView from '../movie-view/movie-view';
 import { RegistrationView } from '../registration-view/registration-view';
 import DirectorView from '../director-view/director-view';
-import { ProfileUpdate } from '../profile-view/profile-update';
+import NavBar from '../navbar/navbar.jsx';
+import ProfileUpdate from '../profile-view/profile-update';
+import ProfileView from '../profile-view/profile-view';
+
 
 class MainView extends React.Component {
   constructor() {
@@ -27,8 +30,16 @@ class MainView extends React.Component {
       user: null,
       email: '',
       birthday: '',
-      token: ''
+      token: '',
+      userInfo: {}
     };
+  }
+
+  updateUser(data) {
+    this.setState({
+      userInfo: data
+    });
+    localStorage.setItem('user', data.Username);
   }
 
   getMovies(token) {
@@ -51,7 +62,7 @@ class MainView extends React.Component {
   getUser(user, token) {
     axios
       //.get("http://localhost:8080/users/" + user, {
-      .get('https://my-flixdb-api2.herokuapp.com/' + user, {
+      .get('https://my-flixdb-api2.herokuapp.com/users/' + user, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(response => {
@@ -59,7 +70,8 @@ class MainView extends React.Component {
         this.setState({
           email: response.data.Email,
           birthday: response.data.Birthday,
-          token: token
+          token: token,
+          userInfo: response.data
         });
       })
       .catch(error => {
@@ -104,13 +116,15 @@ class MainView extends React.Component {
     localStorage.setItem('token', authData.token);
     localStorage.setItem('user', authData.user.Username);
     this.getMovies(authData.token);
+    this.setState({
+      userInfo: authData.user
+    });
   }
 
   // This overrides the render() method of the superclass
   // No need to call super() though, as it does nothing by default
   render() {
-    const { user, token } = this.state;
-
+    const { user, token, userInfo } = this.state;
     // if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
 
     // Before the movies have been loaded
@@ -119,12 +133,14 @@ class MainView extends React.Component {
 
     return (
       <Router>
+          <NavBar />
           <div className="main-view">
             <Route exact path="/" render={() => {
                 if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
                 return <MoviesList />
               }
             }/>
+            <Route exact path="/movies" render={() =>  <MoviesList /> }/>
             <Route path="/movies/:movieId" render={({match}) => <MovieView movieId={match.params.movieId}/>}/>
             <Route path="/directors/:name" render={({ match }) => {
               return <DirectorView directorName={match.params.name} /> }
@@ -134,7 +150,12 @@ class MainView extends React.Component {
             <Route
               exact
               path="/profile/update"
-              render={() => <ProfileUpdate user={user} token={token} />}
+              render={() => <ProfileUpdate userInfo={userInfo} user={user} token={token} updateUser={data => this.updateUser(data)} />}
+            />
+            <Route
+              exact
+              path="/profile"
+              render={() => <ProfileView userInfo={userInfo} />}
             />
           </div>
        </Router>
