@@ -24,7 +24,8 @@ const mapStateToProps = state => {
 };
 
 function MoviesList(props) {
-  const { movies } = props;
+  const { movies, userInfo } = props;
+  const favMovies = userInfo.FavoriteMovies;
 
   if (!movies) return <div className="main-view"/>;
 
@@ -35,7 +36,11 @@ function MoviesList(props) {
         {
           movies.map(m =>
             (<Col key={m._id} xs={12} sm={6} md={4}>
-              <MovieCard key={m._id} movie={m}/>
+              <MovieCard
+                key={m._id}
+                movie={m}
+                favorite={favMovies && favMovies.indexOf(m._id) > -1}
+              />
             </Col>)
           )
         }

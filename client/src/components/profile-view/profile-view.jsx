@@ -5,10 +5,14 @@ import Col from 'react-bootstrap/Col';
 import { Link } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import { connect } from 'react-redux';
 
-import './profile-view.scss'
-export default function ProfileView(props) {
-    const { Username, Email, Birthday } = props.userInfo;
+import './profile-view.scss';
+function ProfileView(props) {
+    const { Username, Email, Birthday, FavoriteMovies = [] } = props.userInfo;
+    const movies = props.movies;
+    const favorites = movies.filter(movie => FavoriteMovies.indexOf(movie._id) > -1)
+
     return (
         <Container>
             <Row className="profile-view">
@@ -32,6 +36,15 @@ export default function ProfileView(props) {
                             <Link to={'/profile/update'}>
                                 <Button variant="link">Update user info</Button>
                             </Link>
+
+                            <div className="card-title h5 h5 fav-movies">Favorite movies</div>
+                            {
+                                favorites.map(m => (
+                                    <Link key={m._id} to={`/movies/${m._id}`}>
+                                       <div><Button variant="link">{m.Title}</Button></div>
+                                    </Link>
+                                ))
+                            }
                         </Card.Body>
                     </Card>
                 </Col>
@@ -41,3 +54,5 @@ export default function ProfileView(props) {
         </Container>
     )
 }
+
+export default connect(({ movies }) => ({ movies }) )(ProfileView);

@@ -140,6 +140,50 @@ app.get("/movies", passport.authenticate('jwt', { session: false }), function(re
   });
 });
 
+app.post("/users/:Username/movies/:MovieID", passport.authenticate("jwt", { session: false }), function(req, res) {
+  Users.findOneAndUpdate({
+    Username: req.params.Username
+  },
+  {
+    $push: {
+      FavoriteMovies: req.params.MovieID
+    }
+  },
+  {
+    new: true
+  },
+  function(err, updatedUser) {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    } else {
+      res.json(updatedUser);
+    }
+  });
+});
+
+app.delete("/users/:Username/movies/:MovieID", passport.authenticate("jwt", { session: false }), function (req, res) {
+  Users.findOneAndUpdate({
+    Username: req.params.Username
+  },
+  {
+    $pull: {
+      FavoriteMovies: req.params.MovieID
+    }
+  },
+  {
+    new: true
+  }, // This line makes sure that the updated document is returned
+  function (err, updatedUser) {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Error: " + err);
+    } else {
+      res.json(updatedUser);
+    }
+  });
+});
+
 app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });

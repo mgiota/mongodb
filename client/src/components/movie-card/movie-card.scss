@@ -1,0 +1,9 @@
+.favme {
+    cursor: pointer;
+    font-size: 28px;
+    color: #ccc;
+
+    &.active {
+        color: lightsalmon;
+    }
+}
