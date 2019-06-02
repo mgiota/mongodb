@@ -25,7 +25,7 @@ const mapStateToProps = state => {
 
 function MoviesList(props) {
   const { movies, userInfo } = props;
-  const favMovies = userInfo.FavoriteMovies;
+  const favMovies = userInfo.FavoriteMovies || [];
 
   if (!movies) return <div className="main-view"/>;
 
@@ -39,7 +39,9 @@ function MoviesList(props) {
               <MovieCard
                 key={m._id}
                 movie={m}
-                favorite={favMovies && favMovies.indexOf(m._id) > -1}
+                favorite={favMovies.indexOf(m._id) > -1}
+                addToFavorites={props.addToFavorites}
+                removeFromFavorites={props.removeFromFavorites}
               />
             </Col>)
           )

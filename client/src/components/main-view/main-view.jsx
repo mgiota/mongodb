@@ -9,7 +9,6 @@ import { setMovies } from '../../actions/actions';
 
 import MoviesList from '../movies-list/movies-list';
 import { LoginView } from '../login-view/login-view';
-import { MovieCard } from '../movie-card/movie-card';
 import MovieView from '../movie-view/movie-view';
 import { RegistrationView } from '../registration-view/registration-view';
 import DirectorView from '../director-view/director-view';
@@ -33,6 +32,9 @@ class MainView extends React.Component {
       token: '',
       userInfo: {}
     };
+
+    this.addToFavorites = this.addToFavorites.bind(this);
+    this.removeFromFavorites = this.removeFromFavorites.bind(this)
   }
 
   updateUser(data) {
@@ -40,6 +42,52 @@ class MainView extends React.Component {
       userInfo: data
     });
     localStorage.setItem('user', data.Username);
+  }
+
+  addToFavorites(movie) {
+    //https://stackoverflow.com/questions/43040721/how-to-update-nested-state-properties-in-react
+    let favorites = this.state.userInfo.FavoriteMovies;
+    if (favorites.indexOf(movie) < 0) {
+      favorites.push(movie);
+    }
+
+    let userInfo = {...this.state.userInfo};
+    userInfo.FavoriteMovies = favorites;
+    this.setState({userInfo});
+
+    // 2nd solution with spread operator
+    // this.setState(prevState => ({
+    //     ...prevState,
+    //     userInfo: {
+    //       ...prevState.userInfo,
+    //       FavoriteMovies: favorites
+    //     }
+    //   })
+    // );
+
+    // WRONG SOLUTION - mutuating the state
+    // this.setState({
+    //   userInfo: {
+    //     FavoriteMovies: favorites
+    //   }
+    // })
+  }
+
+  removeFromFavorites(movieId) {
+    let currFavorites = this.state.userInfo.FavoriteMovies;
+    let favorites = currFavorites.filter(mId => {
+      return mId !== movieId
+    });
+    let userInfo = {...this.state.userInfo};
+    userInfo.FavoriteMovies = favorites;
+    this.setState({userInfo});
+    // this.setState(prevState => ({
+    //   ...prevState,
+    //   userInfo: {
+    //     ...prevState.userInfo,
+    //     FavoriteMovies: favorites
+    //   }
+    // }));
   }
 
   getMovies(token) {
@@ -137,10 +185,19 @@ class MainView extends React.Component {
           <div className="main-view">
             <Route exact path="/" render={() => {
                 if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
-                return <MoviesList userInfo={userInfo} />
+                return <MoviesList
+                  userInfo={userInfo}
+                  addToFavorites={this.addToFavorites}
+                  removeFromFavorites={this.removeFromFavorites}
+                />
               }
             }/>
-            <Route exact path="/movies" render={() =>  <MoviesList userInfo={userInfo} /> }/>
+            <Route exact path="/movies"
+              render={() =>  <MoviesList
+                addToFavorites={this.addToFavorites}
+                removeFromFavorites={this.removeFromFavorites}
+                userInfo={userInfo}
+                /> }/>
             <Route path="/movies/:movieId" render={({match}) => <MovieView movieId={match.params.movieId}/>}/>
             <Route path="/directors/:name" render={({ match }) => {
               return <DirectorView directorName={match.params.name} /> }

@@ -39,9 +39,10 @@ export class MovieCard extends React.Component {
 
   removeFromFavorites() {
     const user = localStorage.getItem('user');
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token');
+    const movieId = this.props.movie._id
     axios
-        .delete(`https://my-flixdb-api2.herokuapp.com/users/${user}/movies/${this.props.movie._id}`,
+        .delete(`https://my-flixdb-api2.herokuapp.com/users/${user}/movies/${movieId}`,
           {
             headers: { Authorization: `Bearer ${token}` }
           }
@@ -51,6 +52,8 @@ export class MovieCard extends React.Component {
           this.setState({
             fav: false
           });
+          this.props.removeFromFavorites(movieId);
+
         })
         .catch(e => {
           console.log(e);
@@ -72,7 +75,7 @@ export class MovieCard extends React.Component {
       this.setState({
         fav: true
       });
-      console.log(this.state, 'again')
+      this.props.addToFavorites(movieId);
     })
     .catch(e => {
       console.log(e);
@@ -80,12 +83,10 @@ export class MovieCard extends React.Component {
   }
 
   toggleClass() {
-    console.log(this.props)
     toggleClick = true;
     if (!this.state.fav) {
       this.addToFavorites(this.props.movie._id);
     } else {
-      console.log('remove from fav');
       this.removeFromFavorites();
     }
 
@@ -95,7 +96,7 @@ export class MovieCard extends React.Component {
     // This is given to the <MovieCard/> component by the outer world,
     // whatever it is :-)
     const { movie } = this.props;
-    console.log(this.state, '!!statee')
+    console.log(this.state, '!!movie state')
     return (
       <Card>
         <Card.Img variant="top" src={process.env.PUBLIC_URL + "/images/" + movie.ImagePath} />
