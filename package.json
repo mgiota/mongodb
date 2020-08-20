@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
-    "bcrypt": "^3.0.4",
+    "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-validator": "^5.3.1",
