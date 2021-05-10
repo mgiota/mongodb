@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import { BrowserRouter as Router, Route} from "react-router-dom";
 
-import { setMovies } from '../../actions/actions';
+import { setMovies, setUser } from '../../actions/actions';
 
 import MoviesList from '../movies-list/movies-list';
 import { LoginView } from '../login-view/login-view';
@@ -133,9 +133,7 @@ class MainView extends React.Component {
 
     let accessToken = localStorage.getItem('token');
     if (accessToken !== null) {
-      this.setState({
-        user: localStorage.getItem('user')
-      });
+      this.props.setUser(localStorage.getItem('user'));
       this.getMovies(accessToken);
       this.getUser(localStorage.getItem("user"), accessToken);
     }
@@ -158,9 +156,7 @@ class MainView extends React.Component {
   // }
 
   onLoggedIn(authData) {
-    this.setState({
-      user: authData.user.Username
-    });
+    this.props.setUser(authData.user.Username);
     localStorage.setItem('token', authData.token);
     localStorage.setItem('user', authData.user.Username);
     this.getMovies(authData.token);
@@ -172,7 +168,8 @@ class MainView extends React.Component {
   // This overrides the render() method of the superclass
   // No need to call super() though, as it does nothing by default
   render() {
-    const { user, token, userInfo } = this.state;
+    const { token, userInfo } = this.state;
+    const { user } = this.props;
     // if (!user) return <LoginView onLoggedIn={user => this.onLoggedIn(user)} />;
 
     // Before the movies have been loaded
@@ -220,4 +217,8 @@ class MainView extends React.Component {
   }
 }
 
-export default connect(null, { setMovies } )(MainView);
+let mapStateToProps = state => {
+  return { movies: state.movies, user: state.user }
+}
+
+export default connect(mapStateToProps, { setMovies, setUser } )(MainView);
